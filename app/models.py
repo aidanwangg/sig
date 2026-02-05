@@ -1,5 +1,5 @@
 
-from sqlalchemy import Column, String, DateTime, Float, ForeignKey, JSON, Index
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, JSON, Index, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 import uuid
@@ -28,6 +28,9 @@ class Incident(Base):
 
 class MetricPoint(Base):
     __tablename__ = "metric_points"
+    __table_args__ = (
+        UniqueConstraint("incident_id", "ts", "metric_name", name="uq_metric_point"),
+    )
 
     id = Column(String, primary_key=True, default=uuid_str)
     incident_id = Column(String, ForeignKey("incidents.id"), nullable=False)
@@ -41,6 +44,9 @@ class MetricPoint(Base):
 
 class Event(Base):
     __tablename__ = "events"
+    __table_args__ = (
+        UniqueConstraint("incident_id", "ts", "event_type", name="uq_event"),
+    )
 
     id = Column(String, primary_key=True, default=uuid_str)
     incident_id = Column(String, ForeignKey("incidents.id"), nullable=False)
